@@ -1,6 +1,7 @@
 import os
 import json
 import openai
+from pydub import AudioSegment
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
