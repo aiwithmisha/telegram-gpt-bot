@@ -10,6 +10,39 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 openai.api_key = OPENAI_API_KEY
 
+async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    voice: Voice = update.message.voice
+    file = await context.bot.get_file(voice.file_id)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        ogg_path = os.path.join(tmpdir, "audio.ogg")
+        mp3_path = os.path.join(tmpdir, "audio.mp3")
+
+        # Скачиваем голосовое сообщение
+        await file.download_to_drive(ogg_path)
+
+        # Конвертируем OGG в MP3
+        audio = AudioSegment.from_file(ogg_path)
+        audio.export(mp3_path, format="mp3")
+
+        # Распознаем с помощью OpenAI Whisper
+        with open(mp3_path, "rb") as audio_file:
+            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+
+        # Получаем текст и отправляем его как сообщение + ответ GPT
+        user_message = transcript["text"]
+        await update.message.reply_text(f"🗣 Вы сказали: {user_message}")
+
+        # Отправляем текст в GPT
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "user", "content": user_message}
+            ]
+        )
+        reply_text = response.choices[0].message["content"]
+        await update.message.reply_text(reply_text)
+
 # Файл для хранения памяти
 MEMORY_FILE = "memory.json"
 
