@@ -2,7 +2,10 @@ import os
 import json
 import openai
 import subprocess
-from telegram import Update
+import tempfile
+from pydub import AudioSegment
+
+from telegram import Update, Voice
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
 # Загружаем API-ключи из переменных окружения
