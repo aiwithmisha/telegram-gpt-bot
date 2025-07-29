@@ -2,10 +2,7 @@ import os
 import json
 import openai
 import subprocess
-import tempfile
-from pydub import AudioSegment
-
-from telegram import Update, Voice
+from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
 # Загружаем API-ключи из переменных окружения
@@ -14,27 +11,31 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 openai.api_key = OPENAI_API_KEY
 
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    voice: Voice = update.message.voice
-    file = await context.bot.get_file(voice.file_id)
+    file = await context.bot.get_file(update.message.voice.file_id)
+    ogg_path = "voice.ogg"
+    mp3_path = "voice.mp3"
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        ogg_path = os.path.join(tmpdir, "audio.ogg")
-        mp3_path = os.path.join(tmpdir, "audio.mp3")
+    await file.download_to_drive(ogg_path)
 
-        # Скачиваем голосовое сообщение
-        await file.download_to_drive(ogg_path)
+    try:
+        subprocess.run(["ffmpeg", "-i", ogg_path, mp3_path], check=True)
+    except subprocess.CalledProcessError:
+        await update.message.reply_text("Ошибка при конвертации голосового сообщения.")
+        return
 
-        # Конвертируем OGG в MP3
-        audio = AudioSegment.from_file(ogg_path)
-        audio.export(mp3_path, format="mp3")
+    with open(mp3_path, "rb") as audio_file:
+        transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
-        # Распознаем с помощью OpenAI Whisper
-        with open(mp3_path, "rb") as audio_file:
-            transcript = openai.Audio.transcribe("whisper-1", audio_file)
+    question = transcript["text"]
+    await update.message.reply_text(f"🗣 Распознано:\n{question}")
 
-        # Получаем текст и отправляем его как сообщение + ответ GPT
-        user_message = transcript["text"]
-        await update.message.reply_text(f"🗣 Вы сказали: {user_message}")
+    messages = [{"role": "user", "content": question}]
+    completion = openai.ChatCompletion.create(model="gpt-4o", messages=messages)
+    answer = completion.choices[0].message["content"]
+    await update.message.reply_text(answer)
+
+    os.remove(ogg_path)
+    os.remove(mp3_path)
 
         # Отправляем текст в GPT
         response = openai.ChatCompletion.create(
