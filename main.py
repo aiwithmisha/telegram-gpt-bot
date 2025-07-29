@@ -37,15 +37,15 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     os.remove(ogg_path)
     os.remove(mp3_path)
 
-        # Отправляем текст в GPT
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "user", "content": user_message}
-            ]
-        )
-        reply_text = response.choices[0].message["content"]
-        await update.message.reply_text(reply_text)
+    # Отправляем текст в GPT
+    response = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "user", "content": user_message}
+        ]
+    )
+    reply_text = response.choices[0].message["content"]
+    await update.message.reply_text(reply_text)
 
 # Файл для хранения памяти
 MEMORY_FILE = "memory.json"
