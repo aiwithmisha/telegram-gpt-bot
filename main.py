@@ -10,43 +10,6 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 openai.api_key = OPENAI_API_KEY
 
-async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    file = await context.bot.get_file(update.message.voice.file_id)
-    ogg_path = "voice.ogg"
-    mp3_path = "voice.mp3"
-
-    await file.download_to_drive(ogg_path)
-
-    try:
-        subprocess.run(["ffmpeg", "-i", ogg_path, mp3_path], check=True)
-    except subprocess.CalledProcessError:
-        await update.message.reply_text("Ошибка при конвертации голосового сообщения.")
-        return
-
-    with open(mp3_path, "rb") as audio_file:
-        transcript = openai.Audio.transcribe("whisper-1", audio_file)
-
-    question = transcript["text"]
-    await update.message.reply_text(f"🗣 Распознано:\n{question}")
-
-    messages = [{"role": "user", "content": question}]
-    completion = openai.ChatCompletion.create(model="gpt-4o", messages=messages)
-    answer = completion.choices[0].message["content"]
-    await update.message.reply_text(answer)
-
-    os.remove(ogg_path)
-    os.remove(mp3_path)
-
-    # Отправляем текст в GPT
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "user", "content": user_message}
-        ]
-    )
-    reply_text = response.choices[0].message["content"]
-    await update.message.reply_text(reply_text)
-
 # Файл для хранения памяти
 MEMORY_FILE = "memory.json"
 
