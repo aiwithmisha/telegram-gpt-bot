@@ -1,10 +1,11 @@
 # Trigger redeploy to force Nixpacks to apply
 import os
 import asyncio
+import nest_asyncio
+nest_asyncio.apply()
 import json
 import openai
 import subprocess
-import telegram  # <--- добавили
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
@@ -107,6 +108,4 @@ async def main():
 )
 
 if __name__ == "__main__":
-    import asyncio
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    asyncio.get_event_loop().run_until_complete(main())
