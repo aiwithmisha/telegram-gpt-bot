@@ -1,6 +1,5 @@
 # Trigger redeploy to force Nixpacks to apply
 import os
-import asyncio
 import json
 import openai
 import subprocess
@@ -81,7 +80,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Привет! Я готов к работе. Напиши мне что-нибудь.")
 
-async def main():
+def main():
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -97,18 +96,11 @@ async def main():
         print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.")
         exit(1)
 
-    await app.run_webhook(
+    app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
         webhook_url=f"{URL}/webhook"
     )
 
 if __name__ == "__main__":
-    import asyncio
-    try:
-        asyncio.get_event_loop().run_until_complete(main())
-    except RuntimeError:
-        # если event loop уже работает (напр. Railway), просто вызываем main без run
-        import nest_asyncio
-        nest_asyncio.apply()
-        asyncio.run(main())
+    main()
