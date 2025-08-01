@@ -101,11 +101,10 @@ async def main():
         exit(1)
 
     await app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=f"{URL}/webhook",
-        shutdown_loop=False  # 👈 ключевая строка
-    )
+    listen="0.0.0.0",
+    port=PORT,
+    webhook_url=f"{URL}/webhook"
+)
 
 if __name__ == "__main__":
     asyncio.run(main())
