@@ -86,9 +86,22 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
-    
-    print("🤖 Бот запущен и работает через polling...")
-    app.run_polling()
+
+    print("🚀 Бот запущен и работает через webhook...")
+
+    PORT = int(os.environ.get("PORT", 8443))
+    URL = os.environ.get("RAILWAY_STATIC_URL")
+
+    if not URL:
+        print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.")
+        exit(1)
+
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=f"{URL}/webhook"
+    )
+
 
 if __name__ == "__main__":
     main()
