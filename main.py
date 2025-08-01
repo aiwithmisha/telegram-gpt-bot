@@ -4,8 +4,11 @@ import asyncio
 import json
 import openai
 import subprocess
+import telegram  # <--- добавили
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+
+print(f"📦 python-telegram-bot version: {telegram.__version__}")  # <--- добавили
 
 # Загружаем API-ключи из переменных окружения
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
