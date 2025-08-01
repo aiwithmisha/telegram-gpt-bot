@@ -5,7 +5,7 @@ import json
 import openai
 import subprocess
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
 # Загружаем API-ключи из переменных окружения
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
