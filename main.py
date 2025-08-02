@@ -101,7 +101,7 @@ async def main():
     print("📌 Handlers добавлены", flush=True)
 
     PORT = int(os.environ.get("PORT", 8443))
-    URL = os.environ.get("RAILWAY_STATIC_URL")
+    URL = os.environ.get("URL")
 
     if not URL:
         print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.", flush=True)
