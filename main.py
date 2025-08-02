@@ -113,12 +113,14 @@ async def main():
     await app.start()
     print("✅ Бот запущен")
 
-    await app.bot.set_webhook(f"{URL}/webhook")
-    print(f"✅ Webhook установлен: {URL}/webhook")
+    await app.updater.start_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path="webhook",
+        webhook_url=f"{URL}/webhook"
+    )
+    print("✅ Webhook успешно установлен через app.updater.start_webhook()")
 
-    await app.updater.start_polling()
-    print("🔁 Переключился на polling (временно)")
-    
     await app.updater.idle()
     print("⌛ Ждём событий...")
 
