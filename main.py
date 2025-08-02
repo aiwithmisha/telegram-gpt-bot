@@ -122,7 +122,6 @@ async def main():
     await app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        webhook_url=f"{URL}/webhook"
     )
     print("✅ Webhook успешно запущен через app.run_webhook()", flush=True)
     
