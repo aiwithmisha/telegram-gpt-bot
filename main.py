@@ -84,6 +84,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # 🚀 Функция старта
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("✅ Функция start вызвана")
     await update.message.reply_text("Привет! Я готов к работе. Напиши мне что-нибудь.")
 
 async def main():
