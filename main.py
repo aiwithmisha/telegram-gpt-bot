@@ -123,11 +123,11 @@ async def main():
         webhook_url=f"{URL}/webhook"
     )
     print("✅ Webhook успешно запущен через app.run_webhook()", flush=True)
-
-    if __name__ == "__main__":
-        print("👀 main() is about to start...", flush=True)
-        import asyncio
-        try:
-            asyncio.run(main())
-        except RuntimeError as e:
-            print(f"❌ RuntimeError: {e}")
+    
+if __name__ == "__main__":
+    print("👀 main() is about to start...", flush=True)
+    import asyncio
+    try:
+        asyncio.run(main())
+    except RuntimeError as e:
+        print(f"❌ RuntimeError: {e}")
