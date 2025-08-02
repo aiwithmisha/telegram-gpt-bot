@@ -106,20 +106,24 @@ async def main():
         exit(1)
 
     await app.initialize()
+    print("✅ Инициализация завершена")
     await app.start()
+    print("✅ Бот запущен")
+    
     await app.updater.start_webhook(
         listen="0.0.0.0",
         port=PORT,
         url_path="webhook",
         webhook_url=f"{URL}/webhook"
     )
-
-    # Ждём завершения — чтобы Railway не остановил контейнер
+    print("✅ Webhook успешно установлен!")
+    
+    # ВАЖНО: удерживает контейнер в рабочем состоянии
     await app.updater.idle()
+    print("⌛ Ждём событий...")
 
     if __name__ == "__main__":
         print("👀 main() is about to start...")
-        import asyncio
         try:
             asyncio.run(main())
         except RuntimeError as e:
