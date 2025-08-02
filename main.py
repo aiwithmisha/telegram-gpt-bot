@@ -105,11 +105,17 @@ async def main():
         print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.")
         exit(1)
 
-    await app.run_webhook(
+    await app.initialize()
+    await app.start()
+    await app.updater.start_webhook(
         listen="0.0.0.0",
         port=PORT,
+        url_path="webhook",
         webhook_url=f"{URL}/webhook"
     )
+
+    # Ждём завершения — чтобы Railway не остановил контейнер
+    await app.updater.idle()
 
     if __name__ == "__main__":
         print("👀 main() is about to start...")
