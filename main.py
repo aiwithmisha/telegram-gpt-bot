@@ -114,13 +114,15 @@ async def main():
     await app.start()
     print("✅ Бот запущен", flush=True)
 
+    await app.set_webhook(f"{URL}/webhook")
+    print(f"✅ Webhook установлен: {URL}/webhook", flush=True)
+
     await app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        webhook_path="/webhook",
         webhook_url=f"{URL}/webhook"
     )
-    print("✅ Webhook запущен через app.run_webhook()", flush=True)
+    print("✅ Webhook успешно запущен через app.run_webhook()", flush=True)
 
     if __name__ == "__main__":
         print("👀 main() is about to start...", flush=True)
