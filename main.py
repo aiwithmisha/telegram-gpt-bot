@@ -110,14 +110,17 @@ async def main():
     
     await app.start()
     print("✅ Бот запущен")
-    
-    await app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=f"{URL}/webhook"
-    )
-    print("✅ Webhook успешно запущен через app.run_webhook()")
-    
+
+        try:
+            await app.run_webhook(
+                listen="0.0.0.0",
+                port=PORT,
+                webhook_url=f"{URL}/webhook"
+            )
+            print("✅ Webhook успешно запущен через app.run_webhook()")
+        except Exception as e:
+            print(f"❌ Ошибка при запуске webhook: {e}")
+        
     # ВАЖНО: удерживает контейнер в рабочем состоянии
     await app.updater.idle()
     print("⌛ Ждём событий...")
