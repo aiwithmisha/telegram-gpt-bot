@@ -122,7 +122,7 @@ async def main():
 
     while True:
         print("🔁 Бот всё ещё работает...", flush=True)
-        wait asyncio.sleep(10)
+        await asyncio.sleep(10)
     
 if __name__ == "__main__":
     print("👀 main() is about to start...", flush=True)
