@@ -98,31 +98,12 @@ async def main():
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    app.add_handler(MessageHandler(filters.VOICE, handle_voice))
 
     print("📌 Handlers добавлены", flush=True)
-
-    PORT = int(os.environ.get("PORT", 8443))
-    print(f"🌐 PORT: {PORT}", flush=True)
-    URL = os.environ.get("URL")
-
-    if not URL:
-        print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.", flush=True)
-        exit(1)
-
-    await app.initialize()
-    print("✅ Инициализация завершена", flush=True)
-    
-    await app.start()
-    print("✅ Бот запущен", flush=True)
 
     print("⚙️ Запускаем polling-режим для диагностики", flush=True)
     await app.run_polling()
     print("✅ Бот успешно запущен через polling", flush=True)
-
-    while True:
-        print("🔁 Бот всё ещё работает...", flush=True)
-        await asyncio.sleep(10)
     
 if __name__ == "__main__":
     print("👀 main() is about to start...", flush=True)
