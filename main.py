@@ -107,8 +107,4 @@ async def main():
     
 if __name__ == "__main__":
     print("👀 main() is about to start...", flush=True)
-    import asyncio
-    try:
-        asyncio.run(main())
-    except RuntimeError as e:
-        print(f"❌ RuntimeError: {e}")
+    asyncio.get_event_loop().run_until_complete(main())
