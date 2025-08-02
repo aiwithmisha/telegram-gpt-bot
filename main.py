@@ -96,7 +96,7 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
 
-    print("🚀 Бот запущен и работает через webhook...")
+    print("🚀 Бот запускается...")
 
     PORT = int(os.environ.get("PORT", 8443))
     URL = os.environ.get("RAILWAY_STATIC_URL")
@@ -107,16 +107,16 @@ async def main():
 
     await app.initialize()
     print("✅ Инициализация завершена")
+    
     await app.start()
     print("✅ Бот запущен")
     
-    await app.updater.start_webhook(
+    await app.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        url_path="webhook",
         webhook_url=f"{URL}/webhook"
     )
-    print("✅ Webhook успешно установлен!")
+    print("✅ Webhook успешно запущен через app.run_webhook()")
     
     # ВАЖНО: удерживает контейнер в рабочем состоянии
     await app.updater.idle()
