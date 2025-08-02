@@ -8,7 +8,7 @@ import telegram  # <--- вот это добавили
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-print(f"📦 python-telegram-bot version: {telegram.__version__}")
+print(f"📦 python-telegram-bot version: {telegram.__version__}", flush=True)
 
 # Загружаем API-ключи из переменных окружения
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -16,8 +16,8 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 openai.api_key = OPENAI_API_KEY
 
 # ⬇️ Добавляем отладочные print'ы
-print(f"🔑 OPENAI_API_KEY exists: {bool(OPENAI_API_KEY)}")
-print(f"🤖 TELEGRAM_BOT_TOKEN exists: {bool(TELEGRAM_BOT_TOKEN)}")
+print(f"🔑 OPENAI_API_KEY exists: {bool(OPENAI_API_KEY)}", flush=True)
+print(f"🤖 TELEGRAM_BOT_TOKEN exists: {bool(TELEGRAM_BOT_TOKEN)}", flush=True)
 
 # Файл для хранения памяти
 MEMORY_FILE = "memory.json"
@@ -86,11 +86,11 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # 🚀 Функция старта
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("✅ Функция start вызвана")
+    print("✅ Функция start вызвана", flush=True)
     await update.message.reply_text("Привет! Я готов к работе. Напиши мне что-нибудь.")
 
 async def main():
-    print("🧪 main() запустился")
+    print("🧪 main() запустился", flush=True)
     
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
@@ -98,20 +98,20 @@ async def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
 
-    print("📌 Handlers добавлены")
+    print("📌 Handlers добавлены", flush=True)
 
     PORT = int(os.environ.get("PORT", 8443))
     URL = os.environ.get("RAILWAY_STATIC_URL")
 
     if not URL:
-        print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.")
+        print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.", flush=True)
         exit(1)
 
     await app.initialize()
-    print("✅ Инициализация завершена")
+    print("✅ Инициализация завершена", flush=True)
     
     await app.start()
-    print("✅ Бот запущен")
+    print("✅ Бот запущен", flush=True)
 
     await app.updater.start_webhook(
         listen="0.0.0.0",
@@ -119,13 +119,13 @@ async def main():
         url_path="webhook",
         webhook_url=f"{URL}/webhook"
     )
-    print("✅ Webhook успешно установлен через app.updater.start_webhook()")
+    print("✅ Webhook успешно установлен через app.updater.start_webhook()", flush=True)
 
     await app.updater.idle()
-    print("⌛ Ждём событий...")
+    print("⏳ Ждём событий...", flush=True)
 
     if __name__ == "__main__":
-        print("👀 main() is about to start...")
+        print("👀 main() is about to start...", flush=True)
         import asyncio
         try:
             asyncio.run(main())
