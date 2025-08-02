@@ -97,12 +97,12 @@ async def main():
     PORT = int(os.environ.get("PORT", 8443))
     URL = os.environ.get("RAILWAY_STATIC_URL")
 
-if not URL:
-    print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.")
-    exit(1)
+    if not URL:
+        print("❌ Ошибка: переменная RAILWAY_STATIC_URL не найдена.")
+        exit(1)
 
-await app.run_webhook(
-    listen="0.0.0.0",
-    port=PORT,
-    webhook_url=f"{URL}/webhook"
-)
+    await app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=f"{URL}/webhook"
+    )
