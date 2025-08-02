@@ -101,6 +101,7 @@ async def main():
     print("📌 Handlers добавлены", flush=True)
 
     PORT = int(os.environ.get("PORT", 8443))
+    print(f"🌐 PORT: {PORT}", flush=True)
     URL = os.environ.get("URL")
 
     if not URL:
