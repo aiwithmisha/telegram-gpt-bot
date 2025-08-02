@@ -119,6 +119,10 @@ async def main():
     print("⚙️ Запускаем polling-режим для диагностики", flush=True)
     await app.run_polling()
     print("✅ Бот успешно запущен через polling", flush=True)
+
+    while True:
+        print("🔁 Бот всё ещё работает...", flush=True)
+        wait asyncio.sleep(10)
     
 if __name__ == "__main__":
     print("👀 main() is about to start...", flush=True)
