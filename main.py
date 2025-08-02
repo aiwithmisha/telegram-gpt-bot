@@ -90,13 +90,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Привет! Я готов к работе. Напиши мне что-нибудь.")
 
 async def main():
+    print("🧪 main() запустился")
+    
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
 
-    print("🚀 Бот запускается...")
+    print("📌 Handlers добавлены")
 
     PORT = int(os.environ.get("PORT", 8443))
     URL = os.environ.get("RAILWAY_STATIC_URL")
@@ -111,17 +113,12 @@ async def main():
     await app.start()
     print("✅ Бот запущен")
 
-    try:
-        await app.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            webhook_url=f"{URL}/webhook"
-        )
-        print("✅ Webhook успешно запущен через app.run_webhook()")
-    except Exception as e:
-        print(f"❌ Ошибка при запуске webhook: {e}")
-        
-    # ВАЖНО: удерживает контейнер в рабочем состоянии
+    await app.bot.set_webhook(f"{URL}/webhook")
+    print(f"✅ Webhook установлен: {URL}/webhook")
+
+    await app.updater.start_polling()
+    print("🔁 Переключился на polling (временно)")
+    
     await app.updater.idle()
     print("⌛ Ждём событий...")
 
