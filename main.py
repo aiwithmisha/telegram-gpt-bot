@@ -34,6 +34,7 @@ def save_memory(memory):
         json.dump(memory, f, ensure_ascii=False, indent=2)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("📥 handle_message вызван", flush=True)
     user_message = update.message.text
     memory = load_memory()
     memory.append({"role": "user", "content": user_message})
@@ -58,6 +59,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # 👇 Новая функция для обработки голосовых сообщений
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("🎤 handle_voice вызван", flush=True)
     file = await context.bot.get_file(update.message.voice.file_id)
     ogg_path = "voice.ogg"
     mp3_path = "voice.mp3"
