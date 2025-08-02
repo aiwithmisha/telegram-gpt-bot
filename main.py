@@ -15,6 +15,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 openai.api_key = OPENAI_API_KEY
 
+# ⬇️ Добавляем отладочные print'ы
+print(f"🔑 OPENAI_API_KEY exists: {bool(OPENAI_API_KEY)}")
+print(f"🤖 TELEGRAM_BOT_TOKEN exists: {bool(TELEGRAM_BOT_TOKEN)}")
+
 # Файл для хранения памяти
 MEMORY_FILE = "memory.json"
 
@@ -106,3 +110,11 @@ async def main():
         port=PORT,
         webhook_url=f"{URL}/webhook"
     )
+
+    if __name__ == "__main__":
+        print("👀 main() is about to start...")
+        import asyncio
+        try:
+            asyncio.run(main())
+        except RuntimeError as e:
+            print(f"❌ RuntimeError: {e}")
