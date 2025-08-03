@@ -103,7 +103,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(answer)
 
-        except Exception as e:
+    except Exception as e:
             print("❌ Ошибка в handle_voice():", e)
             await update.message.reply_text("Произошла ошибка при обработке голосового сообщения.")
     
