@@ -60,39 +60,56 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # 🎤 Обработчик голосовых сообщений
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("🎤 handle_voice вызван", flush=True)
-
-    file = await context.bot.get_file(update.message.voice.file_id)
-    ogg_path = "voice.ogg"
-    mp3_path = "voice.mp3"
-
-    await file.download_to_drive(ogg_path)
-
     try:
+        print("🎤 Получено голосовое сообщение", flush=True)
+
+        if not update.message.voice:
+            await update.message.reply_text("❌ Голосовое сообщение не найдено.")
+            return
+
+        voice = update.message.voice
+        file = await context.bot.get_file(voice.file_id)
+
+        # Уникальные имена файлов
+        import uuid
+        voice_id = str(uuid.uuid4())
+        ogg_path = f"{voice_id}.ogg"
+        mp3_path = f"{voice_id}.mp3"
+
+        await file.download_to_drive(ogg_path)
+        print(f"📥 Скачан файл: {ogg_path}", flush=True)
+
+        # Конвертация в mp3
         subprocess.run(["ffmpeg", "-i", ogg_path, mp3_path], check=True)
-    except subprocess.CalledProcessError:
-        await update.message.reply_text("❌ Ошибка при конвертации голосового сообщения.")
-        return
+        print(f"🎧 Конвертирован в mp3: {mp3_path}", flush=True)
 
-    try:
+        # Распознавание речи
         with open(mp3_path, "rb") as audio_file:
-            transcript = openai.Audio.transcribe("whisper-1", audio_file)
-        question = transcript["text"]
-        await update.message.reply_text(f"🗣 Распознано:\n{question}")
-    except Exception as e:
-        await update.message.reply_text(f"❌ Ошибка при распознавании: {e}")
-        return
+            transcript = openai.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file
+            )
+        question = transcript.text
+        print(f"📝 Распознанный текст: {question}", flush=True)
 
-    try:
-        messages = [{"role": "user", "content": question}]
-        completion = openai.ChatCompletion.create(model="gpt-4o", messages=messages)
-        answer = completion.choices[0].message["content"]
+        # Ответ от GPT
+        response = openai.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": question}],
+            temperature=0.5
+        )
+        answer = response.choices[0].message.content.strip()
+        print(f"🤖 Ответ GPT: {answer}", flush=True)
+
         await update.message.reply_text(answer)
-    except Exception as e:
-        await update.message.reply_text(f"❌ Ошибка от OpenAI при ответе: {e}")
 
-    os.remove(ogg_path)
-    os.remove(mp3_path)
+    except Exception as e:
+        print(f"❌ Ошибка в handle_voice: {e}", flush=True)
+        await update.message.reply_text("Произошла ошибка при обработке голосового сообщения.")
+    finally:
+        for file_path in [ogg_path, mp3_path]:
+            if os.path.exists(file_path):
+                os.remove(file_path)
     
 if __name__ == "__main__":
     print("👀 Бот запускается...", flush=True)
