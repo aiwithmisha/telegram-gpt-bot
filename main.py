@@ -4,8 +4,15 @@ import json
 import openai
 import telegram
 import subprocess
+
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
+)
 
 print(f"📦 python-telegram-bot version: {telegram.__version__}", flush=True)
 
@@ -61,55 +68,44 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # 🎤 Обработчик голосовых сообщений
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        print("🎤 Получено голосовое сообщение", flush=True)
-
-        if not update.message.voice:
-            await update.message.reply_text("❌ Голосовое сообщение не найдено.")
-            return
+        print("🎤 Получено голосовое сообщение")
 
         voice = update.message.voice
-        file = await context.bot.get_file(voice.file_id)
+        file_id = voice.file_id
+        new_file = await context.bot.get_file(file_id)
 
-        # Уникальные имена файлов
-        import uuid
-        voice_id = str(uuid.uuid4())
-        ogg_path = f"{voice_id}.ogg"
-        mp3_path = f"{voice_id}.mp3"
+        # Сохраняем как .ogg
+        ogg_path = "voice.ogg"
+        await new_file.download_to_drive(ogg_path)
+        print("📥 Скачан voice.ogg")
 
-        await file.download_to_drive(ogg_path)
-        print(f"📥 Скачан файл: {ogg_path}", flush=True)
-
-        # Конвертация в mp3
+        # Конвертация .ogg в .mp3
+        mp3_path = "voice.mp3"
         subprocess.run(["ffmpeg", "-i", ogg_path, mp3_path], check=True)
-        print(f"🎧 Конвертирован в mp3: {mp3_path}", flush=True)
+        print("🎧 Конвертирован в voice.mp3")
 
-        # Распознавание речи
+        # Распознавание текста через Whisper (новый синтаксис OpenAI >=1.0.0)
         with open(mp3_path, "rb") as audio_file:
-            transcript = openai.audio.transcriptions.create(
+            transcript = client.audio.transcriptions.create(
                 model="whisper-1",
-                file=audio_file
+                file=audio_file,
             )
         question = transcript.text
-        print(f"📝 Распознанный текст: {question}", flush=True)
+        print("📝 Распознанный текст:", question)
 
-        # Ответ от GPT
-        response = openai.chat.completions.create(
+        # Получение ответа от GPT-4o
+        completion = client.chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "user", "content": question}],
-            temperature=0.5
         )
-        answer = response.choices[0].message.content.strip()
-        print(f"🤖 Ответ GPT: {answer}", flush=True)
+        answer = completion.choices[0].message.content
+        print("🤖 Ответ GPT:", answer)
 
         await update.message.reply_text(answer)
 
-    except Exception as e:
-        print(f"❌ Ошибка в handle_voice: {e}", flush=True)
-        await update.message.reply_text("Произошла ошибка при обработке голосового сообщения.")
-    finally:
-        for file_path in [ogg_path, mp3_path]:
-            if os.path.exists(file_path):
-                os.remove(file_path)
+        except Exception as e:
+            print("❌ Ошибка в handle_voice():", e)
+            await update.message.reply_text("Произошла ошибка при обработке голосового сообщения.")
     
 if __name__ == "__main__":
     print("👀 Бот запускается...", flush=True)
